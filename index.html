@@ -12,7 +12,6 @@
       --text-color: #ffffff;
       --card-bg: #1f1f23;
       --input-bg: #0f0f11;
-      --logo-glow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 40px #0ff;
       --sidebar-width: 280px;
     }
 
@@ -23,7 +22,6 @@
       --text-color: #111827;
       --card-bg: #e5e7eb;
       --input-bg: #ffffff;
-      --logo-glow: 0 0 2px #ff00ff, 0 0 5px #ff00ff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,19 +30,75 @@
     header { height: 60px; background: var(--header-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; transition: background 0.3s; z-index: 10; }
     
     .logo-container { display: flex; align-items: center; gap: 10px; }
-    .logo-text { font-weight: 900; font-size: 24px; font-style: italic; color: var(--text-color); text-transform: uppercase; letter-spacing: 2px; text-shadow: var(--logo-glow); transition: text-shadow 0.3s; }
+    
+    /* High-Saturation Purple-Cyan Overlay Chrome Logo */
+    .logo-text { 
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-weight: 900; 
+      font-size: 24.5px; 
+      font-style: italic; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      padding-right: 8px;
+      
+      background: linear-gradient(
+        135deg,
+        rgba(168, 85, 247, 0.75) 0%,
+        rgba(6, 182, 212, 0.65) 50%,
+        rgba(255, 255, 255, 0.95) 100%
+      ), linear-gradient(
+        to bottom,
+        #ffffff 0%,
+        #ffffff 35%,
+        #d1d5db 45%,
+        #64748b 48%,
+        #f8fafc 50%,
+        #1e293b 53%,
+        #475569 68%,
+        #e2e8f0 85%,
+        #ffffff 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.9));
+    }
+
+    /* System Clock (Clean, Modern, Less Bold, Not Italic) */
+    .header-clock {
+      font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      font-style: normal;
+      letter-spacing: 1px;
+      color: #ffffff;
+      padding: 4px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .header-clock .ampm {
+      font-size: 13px;
+      color: #a855f7;
+      font-weight: 700;
+    }
 
     .btn-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 18px; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-icon:hover { background: var(--card-bg); }
 
-    .layout-controls { display: flex; gap: 8px; align-items: center; margin-right: auto; margin-left: 20px; }
+    .layout-controls { display: flex; gap: 8px; align-items: center; }
     
     .btn-bandwidth { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 13px; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
     .btn-bandwidth.active { background: #9146ff; border-color: #9146ff; color: #fff; font-weight: bold; }
     .btn-bandwidth:hover { background: var(--card-bg); }
     .btn-bandwidth.active:hover { background: #772ce8; }
 
-    .input-group { display: flex; gap: 8px; flex: 1; max-width: 500px; }
+    .input-group { display: flex; gap: 8px; width: 340px; }
     input { flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-color); outline: none; }
     .btn-primary { padding: 8px 16px; background: #9146ff; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer; }
     .btn-primary:hover { background: #772ce8; }
@@ -86,8 +140,19 @@
     .sidebar.compact .channel-meta, 
     .sidebar.compact .channel-title { display: none; }
 
-    /* Smart Dynamic Grid System */
-    .app-container { flex: 1; display: flex; overflow-y: auto; background: #000; padding: 16px; align-items: center; justify-content: center; }
+    /* App Grid Container with Frosted Vignette Dark Background */
+    .app-container { 
+      flex: 1; 
+      display: flex; 
+      overflow-y: auto; 
+      background-color: #0f0f13;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(145, 70, 255, 0.12) 0%, rgba(0, 0, 0, 0.75) 85%),
+        linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
+      padding: 16px; 
+      align-items: center; 
+      justify-content: center; 
+    }
     
     .streams-grid { 
       display: grid; 
@@ -101,13 +166,47 @@
       justify-content: center;
     }
 
-    /* Dynamic columns/rows based on item count applied via JavaScript */
+    /* Normal Layout Grid States */
     .streams-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; max-width: 1200px; }
     .streams-grid.count-2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: 1fr; }
     .streams-grid.count-3 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
     .streams-grid.count-3 .stream-card:nth-child(3) { grid-column: span 2; width: 60%; justify-self: center; }
     .streams-grid.count-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
     .streams-grid.count-5, .streams-grid.count-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+
+    /* Showstopper Mode Layout: Main stream gets ~65% width, side streams stack vertically in ~32% */
+    .streams-grid.has-showstopper {
+      grid-template-columns: 1fr 340px !important;
+      grid-template-rows: 1fr !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      align-items: stretch;
+    }
+    
+    .streams-grid.has-showstopper .stream-card.showstopper {
+      grid-column: 1 / 2 !important;
+      grid-row: 1 / -1 !important;
+      height: 100% !important;
+      border: 2px solid #a855f7;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+    }
+
+    .streams-grid.has-showstopper .side-streams-column {
+      grid-column: 2 / 3 !important;
+      grid-row: 1 / -1 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      height: 100%;
+      padding-right: 4px;
+    }
+
+    .streams-grid.has-showstopper .side-streams-column .stream-card {
+      height: 220px !important;
+      min-height: 220px !important;
+      flex-shrink: 0;
+    }
     
     .stream-card { 
       background: var(--header-bg); 
@@ -116,17 +215,18 @@
       display: flex; 
       flex-direction: column; 
       position: relative; 
-      transition: opacity 0.2s; 
+      transition: opacity 0.2s, border 0.2s, box-shadow 0.2s; 
       border: 1px solid var(--border-color); 
       width: 100%;
       height: 100%;
       max-height: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
     
     .stream-header { height: 32px; background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; cursor: grab; user-select: none; flex-shrink: 0; }
     .stream-header:active { cursor: grabbing; }
     .drag-handle { color: #a1a1aa; margin-right: 8px; cursor: inherit; }
-    .stream-card.dragging { opacity: 0.4; border: 2px dashed #ff00ff; }
+    .stream-card.dragging { opacity: 0.4; border: 2px dashed #00ffff; }
     body.is-dragging iframe { pointer-events: none; }
     
     .stream-body { 
@@ -145,7 +245,6 @@
     }
     .video-frame { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-    /* Integrated Chat Panel Layout */
     .chat-container { 
       width: 280px; 
       height: 100%; 
@@ -160,7 +259,8 @@
     .card-actions { display: flex; align-items: center; gap: 6px; }
     .btn-card-action { background: transparent; color: #a1a1aa; border: none; font-size: 14px; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
     .btn-card-action:hover { background: var(--header-bg); color: #fff; }
-    .btn-card-action.active { color: #ff00ff; font-weight: bold; background: var(--border-color); }
+    .btn-card-action.active { color: #a855f7; font-weight: bold; background: var(--border-color); }
+    .btn-showstopper.active { color: #f59e0b; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); }
     .btn-remove:hover { color: #ef4444; }
   </style>
   <script src="https://player.twitch.tv/js/embed/v1.js"></script>
@@ -170,7 +270,7 @@
   <header>
     <div class="logo-container">
       <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Dashboard">☰</button>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 5px #ff00ff);">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 5px #00ffff);">
         <circle cx="12" cy="12" r="10"></circle>
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
         <path d="M2 12h20"></path>
@@ -178,16 +278,23 @@
       <div class="logo-text">OMNISTREAMER</div>
     </div>
     
-    <div class="layout-controls">
-      <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
-      <button class="btn-bandwidth" id="bandwidthBtn" onclick="toggleBandwidthSaver()" title="Cap all streams to 720p to save bandwidth">
-        ⚡ 720p Cap
-      </button>
+    <!-- Centered System Clock -->
+    <div class="header-clock" id="systemClock">
+      <span id="clockTime">00:00:00</span> <span class="ampm" id="clockAmPm">AM</span>
     </div>
 
-    <div class="input-group">
-      <input type="text" id="streamUrl" placeholder="Paste Twitch channel URL or username..." onkeydown="if(event.key === 'Enter') addStream()">
-      <button class="btn-primary" onclick="addStream()">Add Stream</button>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div class="layout-controls">
+        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
+        <button class="btn-bandwidth" id="bandwidthBtn" onclick="toggleBandwidthSaver()" title="Cap all streams to 720p to save bandwidth">
+          ⚡ 720p Cap
+        </button>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="streamUrl" placeholder="Paste Twitch channel URL or username..." onkeydown="if(event.key === 'Enter') addStream()">
+        <button class="btn-primary" onclick="addStream()">Add Stream</button>
+      </div>
     </div>
   </header>
 
@@ -220,10 +327,89 @@
     let previousLiveSet = new Set();
     let isBandwidthSaverActive = false;
     let activePlayers = [];
+    let showstopperCardId = null;
+
+    // Live System Clock Updater
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      const formattedHours = String(hours).padStart(2, '0');
+
+      document.getElementById('clockTime').textContent = `${formattedHours}:${minutes}:${seconds}`;
+      document.getElementById('clockAmPm').textContent = ampm;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     function updateGridClass() {
-      const count = streamsGrid.children.length;
+      // Remove any existing side-streams wrapper if present
+      const sideCol = streamsGrid.querySelector('.side-streams-column');
+      if (sideCol) {
+        // Move cards back to main grid root
+        while (sideCol.firstChild) {
+          streamsGrid.appendChild(sideCol.firstChild);
+        }
+        sideCol.remove();
+      }
+
+      // Reset all cards' showstopper classes
+      document.querySelectorAll('.stream-card').forEach(c => c.classList.remove('showstopper'));
+
+      const allCards = Array.from(streamsGrid.querySelectorAll('.stream-card'));
+      const count = allCards.length;
+
+      if (showstopperCardId && count > 1) {
+        const showCard = allCards.find(c => c.dataset.cardId === showstopperCardId);
+        if (showCard) {
+          streamsGrid.className = 'streams-grid has-showstopper';
+          showCard.classList.add('showstopper');
+          
+          // Create side column for the rest
+          const sideColumn = document.createElement('div');
+          sideColumn.className = 'side-streams-column';
+          
+          allCards.forEach(c => {
+            if (c.dataset.cardId !== showstopperCardId) {
+              sideColumn.appendChild(c);
+            }
+          });
+          streamsGrid.appendChild(sideColumn);
+          return;
+        } else {
+          showstopperCardId = null; // Card was removed
+        }
+      }
+
+      // Standard grid layout
       streamsGrid.className = `streams-grid count-${Math.min(count, 6)}`;
+    }
+
+    function toggleShowstopper(cardId) {
+      if (showstopperCardId === cardId) {
+        showstopperCardId = null; // Toggle off
+      } else {
+        showstopperCardId = cardId; // Set new showstopper
+      }
+
+      // Update button visual states across all cards
+      document.querySelectorAll('.stream-card').forEach(c => {
+        const btn = c.querySelector('.btn-showstopper');
+        if (c.dataset.cardId === showstopperCardId) {
+          btn.classList.add('active');
+          btn.title = 'Exit Showstopper Mode';
+        } else {
+          btn.classList.remove('active');
+          btn.title = 'Make Showstopper Stream';
+        }
+      });
+
+      updateGridClass();
     }
 
     function toggleSidebar() {
@@ -452,6 +638,7 @@
             <span><strong>${parsed.id}</strong></span>
           </div>
           <div class="card-actions">
+            <button class="btn-card-action btn-showstopper" title="Make Showstopper Stream" onclick="toggleShowstopper('${cardId}')">⭐</button>
             <button class="btn-card-action" id="btn-chat-${cardId}" title="Toggle Chat Panel" onclick="toggleIntegratedChat('${cardId}')">💬</button>
             <button class="btn-card-action btn-remove" title="Remove stream" onclick="removeStreamCard('${cardId}')">✕</button>
           </div>
@@ -475,7 +662,13 @@
         streamsGrid.insertBefore(draggedCard, e.clientX < (rect.x + rect.width / 2) ? this : this.nextSibling);
       });
 
-      streamsGrid.appendChild(card);
+      // If we are currently in showstopper mode, append properly into the side column or root
+      if (showstopperCardId && streamsGrid.querySelector('.side-streams-column')) {
+        streamsGrid.querySelector('.side-streams-column').appendChild(card);
+      } else {
+        streamsGrid.appendChild(card);
+      }
+      
       input.value = '';
       updateGridClass();
 
@@ -506,8 +699,8 @@
       });
     }
 
-    // --- Integrated Chat Toggle Logic ---
     function toggleIntegratedChat(cardId) {
+      // Find the card regardless of whether it's in root or side column
       const card = document.querySelector(`[data-card-id="${cardId}"]`);
       const btn = document.getElementById('btn-chat-' + cardId);
       const iframe = document.getElementById('chat-iframe-' + cardId);
@@ -526,6 +719,9 @@
     }
 
     function removeStreamCard(cardId) {
+      if (showstopperCardId === cardId) {
+        showstopperCardId = null;
+      }
       activePlayers = activePlayers.filter(item => item.id !== cardId);
       const card = document.querySelector(`[data-card-id="${cardId}"]`);
       if (card) {
