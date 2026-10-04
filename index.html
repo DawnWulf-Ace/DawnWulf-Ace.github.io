@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The OmniStreamer - Twitch Multi-Stream Viewer</title>
+  <title>Omnistreamer - Twitch Multi-Viewer</title>
   <style>
     :root {
       --bg-color: #0e0e10;
@@ -113,20 +113,22 @@
       border-right: 1px solid var(--border-color); 
       display: flex; 
       flex-direction: column; 
-      transition: width 0.3s ease, margin-left 0.3s ease; 
-      margin-left: 0;
+      transition: width 0.3s ease; 
       z-index: 5;
     }
     
-    .sidebar.compact { --sidebar-width: 160px; }
-    .sidebar.closed { margin-left: calc(var(--sidebar-width) * -1); }
+    .sidebar.compact { --sidebar-width: 72px; }
     
-    .sidebar-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+    .sidebar-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; align-items: center; white-space: nowrap; overflow: hidden; }
+    .sidebar.compact .sidebar-header { justify-content: center; padding: 12px 6px; }
+    .sidebar.compact .sidebar-header > *:not(.sidebar-actions) { display: none; }
+    .sidebar.compact .sidebar-actions { width: 100%; justify-content: center; }
+
     .sidebar-actions { display: flex; gap: 6px; align-items: center; }
     .sidebar-content { flex: 1; overflow-y: auto; padding: 8px; }
     
     /* Live Channel Items */
-    .live-channel { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; overflow: hidden; }
+    .live-channel { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; overflow: hidden; position: relative; }
     .live-channel:hover { background: var(--card-bg); border-color: var(--border-color); }
     
     .channel-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
@@ -137,8 +139,36 @@
     .channel-title { font-size: 11px; color: #a1a1aa; text-overflow: ellipsis; overflow: hidden; margin-top: 4px; }
     .live-dot { color: #ef4444; font-size: 10px; margin-right: 4px; }
 
-    .sidebar.compact .channel-meta, 
-    .sidebar.compact .channel-title { display: none; }
+    /* Compact / Icon-Only Sidebar Adjustments */
+    .sidebar.compact .live-channel { justify-content: center; padding: 6px; }
+    .sidebar.compact .channel-info { display: none; }
+
+    /* Custom Tooltip on Hover in Compact Mode */
+    .sidebar.compact .live-channel::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 78px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #18181b;
+      color: #fff;
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 100;
+    }
+
+    .sidebar.compact .live-channel:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
 
     /* App Grid Container with Frosted Vignette Dark Background */
     .app-container { 
@@ -413,10 +443,6 @@
     }
 
     function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('closed');
-    }
-
-    function toggleCompactMode() {
       document.getElementById('sidebar').classList.toggle('compact');
     }
 
@@ -427,7 +453,7 @@
       }
       Notification.requestPermission().then(permission => {
         if (permission === "granted") {
-          new Notification("OmniStreamer", { body: "Live notifications are now enabled!" });
+          new Notification("Omnistreamer", { body: "Live notifications are now enabled!" });
         }
       });
     }
@@ -472,13 +498,9 @@
           twitchUserId = data.data[0].id;
           
           document.getElementById('sidebarHeader').innerHTML = `
-            <div style="display: flex; flex-direction: column;">
-              <span>Live Follows</span>
-              <span style="font-size: 11px; font-weight: normal; color: #a1a1aa;">${data.data[0].display_name}</span>
-            </div>
+            <span style="overflow: hidden; text-overflow: ellipsis;">${data.data[0].display_name}</span>
             <div class="sidebar-actions">
               <button class="btn-icon" onclick="requestNotificationPermission()" title="Enable Desktop Notifications" style="padding: 4px 8px; font-size: 14px;">🔔</button>
-              <button class="btn-icon" onclick="toggleCompactMode()" title="Toggle Compact View" style="padding: 4px 8px; font-size: 14px;">↔️</button>
             </div>
           `;
           
@@ -548,16 +570,19 @@
         return;
       }
       
-      content.innerHTML = channels.map(c => `
-        <div class="live-channel" onclick="addStreamFromSidebar('${c.user_name}')">
-          <img src="${c.avatar}" class="channel-avatar" alt="${c.user_name}">
-          <div class="channel-info">
-            <div class="channel-name">${c.user_name}</div>
-            <div class="channel-meta"><span class="live-dot">●</span> ${c.viewer_count.toLocaleString()} • ${c.game_name}</div>
-            <div class="channel-title">${c.title}</div>
+      content.innerHTML = channels.map(c => {
+        const tooltipText = `${c.user_name} | ${c.viewer_count.toLocaleString()} viewers | Playing ${c.game_name}`;
+        return `
+          <div class="live-channel" onclick="addStreamFromSidebar('${c.user_name}')" data-tooltip="${tooltipText.replace(/"/g, '&quot;')}">
+            <img src="${c.avatar}" class="channel-avatar" alt="${c.user_name}">
+            <div class="channel-info">
+              <div class="channel-name">${c.user_name}</div>
+              <div class="channel-meta"><span class="live-dot">●</span> ${c.viewer_count.toLocaleString()} • ${c.game_name}</div>
+              <div class="channel-title">${c.title}</div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function addStreamFromSidebar(username) {
@@ -677,6 +702,7 @@
         height: '100%',
         channel: parsed.id,
         parent: [DOMAIN],
+        autoplay: true,
         muted: true
       };
       
