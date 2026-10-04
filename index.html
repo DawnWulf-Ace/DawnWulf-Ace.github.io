@@ -86,8 +86,64 @@
       font-weight: 700;
     }
 
-    .btn-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 18px; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 18px; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
     .btn-icon:hover { background: var(--card-bg); }
+
+    /* Notification Center in Header */
+    .notif-wrapper { position: relative; }
+    .notif-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 1px 5px;
+      border-radius: 10px;
+      display: none;
+    }
+    .notif-dropdown {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      width: 320px;
+      max-height: 400px;
+      background: var(--header-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .notif-dropdown.open { display: flex; }
+    .notif-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: bold;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+    }
+    .notif-list { overflow-y: auto; max-height: 350px; }
+    .notif-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .notif-item:hover { background: var(--card-bg); }
+    .notif-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
+    .notif-info { display: flex; flex-direction: column; overflow: hidden; }
+    .notif-name { font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .notif-game { font-size: 11px; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
     .layout-controls { display: flex; gap: 8px; align-items: center; }
     
@@ -136,33 +192,6 @@
 
     .sidebar.compact .live-channel { justify-content: center; padding: 6px; }
     .sidebar.compact .channel-info { display: none; }
-
-    /* Tooltip popup in compact sidebar mode */
-    .sidebar.compact .live-channel::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: 78px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #18181b;
-      color: #fff;
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      white-space: pre-line;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-      z-index: 100;
-    }
-
-    .sidebar.compact .live-channel:hover::after {
-      opacity: 1;
-      visibility: visible;
-    }
 
     .app-container { 
       flex: 1; 
@@ -305,10 +334,27 @@
 
     <div style="display: flex; gap: 16px; align-items: center;">
       <div class="layout-controls">
-        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
-        <button class="btn-bandwidth" id="bandwidthBtn" onclick="toggleBandwidthSaver()" title="Cap all streams to 720p to save bandwidth">
-          ⚡ 720p Cap
+        <button class="btn-bandwidth active" id="bandwidthBtn" onclick="toggleBandwidthSaver()" title="Cap all streams to 720p to save bandwidth">
+          ⚡ 720p Active
         </button>
+        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
+        
+        <!-- Header Notification Center Block -->
+        <div class="notif-wrapper">
+          <button class="btn-icon" onclick="toggleNotificationDropdown()" title="Live Notifications">
+            🔔
+            <span class="notif-badge" id="notifBadge">0</span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <span>Live Alerts</span>
+              <button class="btn-card-action" onclick="clearNotifications()" style="font-size: 11px;">Clear All</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <div style="padding: 16px; text-align: center; color: #a1a1aa; font-size: 12px;">No new live notifications</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
@@ -345,9 +391,10 @@
     let twitchAccessToken = null;
     let twitchUserId = null;
     let previousLiveSet = new Set();
-    let isBandwidthSaverActive = false;
+    let isBandwidthSaverActive = true; // Enabled by default
     let activePlayers = [];
     let showstopperCardId = null;
+    let notificationsList = [];
 
     function updateClock() {
       const now = new Date();
@@ -429,17 +476,17 @@
       document.getElementById('sidebar').classList.toggle('compact');
     }
 
-    function requestNotificationPermission() {
-      if (!("Notification" in window)) {
-        alert("This browser does not support desktop notifications.");
-        return;
-      }
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          new Notification("Omnistreamer", { body: "Live notifications are now enabled!" });
-        }
-      });
+    function toggleNotificationDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      dropdown.classList.toggle('open');
     }
+
+    // Close notification dropdown when clicking outside
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.notif-wrapper')) {
+        document.getElementById('notifDropdown').classList.remove('open');
+      }
+    });
 
     function loginTwitch() {
       const redirectUri = window.location.href.split('#')[0];
@@ -482,9 +529,7 @@
           
           document.getElementById('sidebarHeader').innerHTML = `
             <span style="overflow: hidden; text-overflow: ellipsis;">${data.data[0].display_name}</span>
-            <div class="sidebar-actions">
-              <button class="btn-icon" onclick="requestNotificationPermission()" title="Enable Desktop Notifications" style="padding: 4px 8px; font-size: 14px;">🔔</button>
-            </div>
+            <div class="sidebar-actions"></div>
           `;
           
           fetchLiveFollows();
@@ -510,18 +555,7 @@
         }
 
         const currentLiveSet = new Set(streams.map(s => s.user_id));
-        if (previousLiveSet.size > 0 && Notification.permission === "granted") {
-          streams.forEach(s => {
-            if (!previousLiveSet.has(s.user_id)) {
-              new Notification(`${s.user_name} is now live!`, {
-                body: `${s.title} (${s.game_name})`,
-                icon: 'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142694348.png'
-              });
-            }
-          });
-        }
-        previousLiveSet = currentLiveSet;
-
+        
         const userIds = streams.slice(0, 100).map(s => s.user_id);
         const queryParams = userIds.map(id => `id=${id}`).join('&');
         
@@ -540,10 +574,59 @@
           avatar: avatarMap[s.user_id] || ''
         }));
 
+        if (previousLiveSet.size > 0) {
+          enrichedStreams.forEach(s => {
+            if (!previousLiveSet.has(s.user_id)) {
+              addHeaderNotification(s);
+            }
+          });
+        }
+        previousLiveSet = currentLiveSet;
+
         renderLiveChannels(enrichedStreams);
       } catch (err) {
         console.error("Twitch API Error", err);
       }
+    }
+
+    function addHeaderNotification(stream) {
+      notificationsList.unshift(stream);
+      updateNotificationUI();
+    }
+
+    function updateNotificationUI() {
+      const badge = document.getElementById('notifBadge');
+      const list = document.getElementById('notifList');
+      
+      if (notificationsList.length > 0) {
+        badge.textContent = notificationsList.length;
+        badge.style.display = 'block';
+        
+        list.innerHTML = notificationsList.map((n, idx) => `
+          <div class="notif-item" onclick="openNotificationStream('${n.user_name}', ${idx})">
+            <img src="${n.avatar || 'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142694348.png'}" class="notif-avatar" alt="${n.user_name}">
+            <div class="notif-info">
+              <div class="notif-name">${n.user_name} is now live!</div>
+              <div class="notif-game">${n.game_name || 'Streaming'}</div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        badge.style.display = 'none';
+        list.innerHTML = '<div style="padding: 16px; text-align: center; color: #a1a1aa; font-size: 12px;">No new live notifications</div>';
+      }
+    }
+
+    function openNotificationStream(username, index) {
+      addStreamFromSidebar(username);
+      notificationsList.splice(index, 1);
+      updateNotificationUI();
+      document.getElementById('notifDropdown').classList.remove('open');
+    }
+
+    function clearNotifications() {
+      notificationsList = [];
+      updateNotificationUI();
     }
 
     function renderLiveChannels(channels) {
@@ -554,9 +637,8 @@
       }
       
       content.innerHTML = channels.map(c => {
-        const tooltipText = `${c.user_name}\n👁️️ ${c.viewer_count.toLocaleString()} viewers\n🎮 ${c.game_name}`;
         return `
-          <div class="live-channel" onclick="addStreamFromSidebar('${c.user_name}')" data-tooltip="${tooltipText.replace(/"/g, '&quot;')}">
+          <div class="live-channel" onclick="addStreamFromSidebar('${c.user_name}')">
             <img src="${c.avatar}" class="channel-avatar" alt="${c.user_name}">
             <div class="channel-info">
               <div class="channel-name">${c.user_name}</div>
@@ -576,7 +658,7 @@
     function toggleTheme() {
       const body = document.body;
       body.classList.toggle('light-mode');
-      document.getElementById('themeIcon').textContent = body.classList.contains('light-mode') ? '☀️' : '🌓';
+      document.getElementById('themeIcon').textContent = body.classList.contains('light-mode') ? '☀️️' : '🌓';
     }
 
     function toggleBandwidthSaver() {
@@ -685,7 +767,7 @@
         channel: parsed.id,
         parent: [DOMAIN],
         autoplay: true,
-        muted: true // Muted initialization guaranteed to satisfy browser autoplay policies
+        muted: true
       };
       
       const player = new Twitch.Player(cardId, options);
@@ -694,13 +776,10 @@
         activePlayers.push({ id: cardId, player: player });
         player.play();
         
-        // Attempt to unmute after player starts
         setTimeout(() => {
           try {
             player.setMuted(false);
-          } catch (e) {
-            // Browser restricted unmuted autoplay; user can click stream volume icon
-          }
+          } catch (e) {}
         }, 500);
         
         if (isBandwidthSaverActive) {
