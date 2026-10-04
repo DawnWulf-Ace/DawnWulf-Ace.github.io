@@ -348,7 +348,7 @@
 
   <script>
     const TWITCH_CLIENT_ID = 'hpipujxbz2nvmjjshhed7ewn2xvg13'; 
-    const DOMAIN = window.location.hostname; 
+    const DOMAIN = window.location.hostname || 'localhost'; 
     const streamsGrid = document.getElementById('streamsGrid');
     
     let draggedCard = null;
@@ -703,13 +703,15 @@
         channel: parsed.id,
         parent: [DOMAIN],
         autoplay: true,
-        muted: true
+        muted: false
       };
       
       const player = new Twitch.Player(cardId, options);
       
       player.addEventListener(Twitch.Player.READY, () => {
         activePlayers.push({ id: cardId, player: player });
+        player.setMuted(false);
+        player.play();
         
         if (isBandwidthSaverActive) {
           try {
