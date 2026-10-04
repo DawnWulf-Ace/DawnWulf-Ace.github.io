@@ -10,6 +10,11 @@
     
     /* Header Bar */
     header { height: 50px; background: #18181b; border-bottom: 1px solid #2d2d31; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; }
+    
+    /* Layout Controls */
+    .layout-controls { display: flex; gap: 8px; align-items: center; margin-right: auto; margin-left: 20px; }
+    select { background: #0f0f11; color: #fff; border: 1px solid #3a3a3c; padding: 6px 12px; border-radius: 4px; outline: none; cursor: pointer; }
+
     .input-group { display: flex; gap: 8px; flex: 1; max-width: 600px; }
     input { flex: 1; padding: 8px 12px; background: #0f0f11; border: 1px solid #3a3a3c; border-radius: 4px; color: #fff; outline: none; }
     button { padding: 8px 16px; background: #9146ff; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer; }
@@ -21,33 +26,62 @@
     
     /* Stream & Chat Cards */
     .stream-card { background: #18181b; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
-    .stream-header { height: 32px; background: #1f1f23; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 12px; }
+    .stream-header { height: 32px; background: #1f1f23; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; }
     .stream-content { flex: 1; display: flex; }
     .video-frame { flex: 1; border: none; height: 100%; width: 100%; }
-    .chat-frame { width: 300px; border: none; border-left: 1px solid #2d2d31; height: 100%; display: block; }
-    .btn-remove { background: #e53935; padding: 2px 8px; font-size: 11px; }
+    
+    /* Layout Modifier Classes */
+    /* SIDE CHAT (Default) */
+    .layout-side .stream-content { flex-direction: row; }
+    .layout-side .chat-frame { width: 300px; height: 100%; border-left: 1px solid #2d2d31; border-top: none; display: block; }
+    
+    /* BOTTOM CHAT */
+    .layout-bottom .stream-content { flex-direction: column; }
+    .layout-bottom .chat-frame { width: 100%; height: 250px; border-top: 1px solid #2d2d31; border-left: none; display: block; }
+    
+    /* HIDDEN CHAT */
+    .layout-hidden .chat-frame { display: none; }
+
+    /* X Button */
+    .btn-remove { background: transparent; color: #a1a1aa; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+    .btn-remove:hover { color: #ef4444; }
   </style>
 </head>
 <body>
 
   <header>
     <div style="font-weight: bold; font-size: 18px;">StreamSync</div>
+    
+    <div class="layout-controls">
+      <label for="layoutMode" style="font-size: 13px; color: #a1a1aa;">Chat Layout:</label>
+      <select id="layoutMode" onchange="updateLayout()">
+        <option value="layout-side">Side</option>
+        <option value="layout-bottom">Bottom</option>
+        <option value="layout-hidden">Hidden</option>
+      </select>
+    </div>
+
     <div class="input-group">
       <input type="text" id="streamUrl" placeholder="Paste Twitch, YouTube, or Kick channel/video URL...">
       <button onclick="addStream()">Add Stream</button>
     </div>
   </header>
 
-  <div class="app-container">
+  <!-- Notice the default layout class "layout-side" applied here -->
+  <div class="app-container layout-side" id="appContainer">
     <div class="streams-grid" id="streamsGrid"></div>
   </div>
 
   <script>
-    // CHANGED: Automatically grabs your GitHub Pages domain
     const DOMAIN = window.location.hostname; 
     const streamsGrid = document.getElementById('streamsGrid');
 
-    // Parse URL into Platform + Stream ID
+    function updateLayout() {
+      const container = document.getElementById('appContainer');
+      const mode = document.getElementById('layoutMode').value;
+      container.className = 'app-container ' + mode;
+    }
+
     function parseStreamUrl(url) {
       if (url.includes('twitch.tv/')) {
         const id = url.split('twitch.tv/')[1].split('/')[0].split('?')[0];
@@ -65,20 +99,22 @@
       return null;
     }
 
-    // Build Platform Iframe Embed Sources
     function getEmbedUrls(platform, id) {
       switch (platform) {
         case 'twitch':
+          // CHANGED: Added &muted=true to the video URL
           return {
-            video: `https://player.twitch.tv/?channel=${id}&parent=${DOMAIN}`,
+            video: `https://player.twitch.tv/?channel=${id}&parent=${DOMAIN}&muted=true`,
             chat: `https://www.twitch.tv/embed/${id}/chat?parent=${DOMAIN}`
           };
         case 'youtube':
+          // CHANGED: Added &mute=1 to the video URL
           return {
-            video: `https://www.youtube.com/embed/${id}?autoplay=1`,
+            video: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`,
             chat: `https://www.youtube.com/live_chat?v=${id}&embed_domain=${DOMAIN}`
           };
         case 'kick':
+          // Kick relies on the browser's autoplay policies, which natively mute unprompted video
           return {
             video: `https://player.kick.com/${id}`,
             chat: `https://kick.com/popout/${id}/chat`
@@ -87,6 +123,11 @@
     }
 
     function addStream() {
+      if (streamsGrid.children.length >= 6) {
+        alert('Maximum of 6 streams allowed at once.');
+        return;
+      }
+
       const input = document.getElementById('streamUrl');
       const parsed = parseStreamUrl(input.value.trim());
 
@@ -99,10 +140,11 @@
 
       const card = document.createElement('div');
       card.className = 'stream-card';
+      
       card.innerHTML = `
         <div class="stream-header">
           <span><strong>${parsed.platform.toUpperCase()}</strong>: ${parsed.id}</span>
-          <button class="btn-remove" onclick="this.closest('.stream-card').remove()">Remove</button>
+          <button class="btn-remove" title="Remove stream" onclick="this.closest('.stream-card').remove()">✕</button>
         </div>
         <div class="stream-content">
           <iframe class="video-frame" src="${video}" allowfullscreen></iframe>
