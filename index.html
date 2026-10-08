@@ -1,256 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omnistreamer - Twitch Multi-Viewer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniStreamer - Multi-Stream Viewer</title>
   <style>
     :root {
       --bg-color: #0e0e10;
-      --header-bg: #18181b;
-      --border-color: #2d2d31;
-      --text-color: #ffffff;
-      --card-bg: #1f1f23;
-      --input-bg: #0f0f11;
-      --sidebar-width: 280px;
+      --card-bg: #18181b;
+      --accent-color: #9146ff;
+      --accent-hover: #772ce8;
+      --text-color: #efeff1;
+      --border-color: #2f2f35;
+      --header-height: 50px;
     }
 
-    body.light-mode {
-      --bg-color: #f3f4f6;
-      --header-bg: #ffffff;
-      --border-color: #d1d5db;
-      --text-color: #111827;
-      --card-bg: #e5e7eb;
-      --input-bg: #ffffff;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
-    
-    header { height: 60px; background: var(--header-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; transition: background 0.3s; z-index: 10; }
-    
-    .logo-container { display: flex; align-items: center; gap: 10px; }
-    
-    .logo-text { 
-      font-family: 'Impact', 'Arial Black', sans-serif;
-      font-weight: 900; 
-      font-size: 24.5px; 
-      font-style: italic; 
-      text-transform: uppercase; 
-      letter-spacing: 0.5px; 
-      padding-right: 8px;
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.75) 0%, rgba(6, 182, 212, 0.65) 50%, rgba(255, 255, 255, 0.95) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.9));
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .header-clock {
-      font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
-      font-size: 18px;
+    /* Navbar */
+    header {
+      height: var(--header-height);
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+    }
+
+    .brand {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    button {
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
       font-weight: 600;
-      color: #ffffff;
-      padding: 4px 14px;
-      background: rgba(255, 255, 255, 0.03);
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+    }
+
+    button.secondary {
+      background: #26262c;
+      border: 1px solid var(--border-color);
+    }
+
+    button.secondary:hover {
+      background: #3a3a42;
+    }
+
+    button.active {
+      background: #2e7d32;
+    }
+
+    /* Main Grid Layout */
+    #streams-grid {
+      flex: 1;
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      width: 100%;
+      height: calc(100vh - var(--header-height));
+      overflow: hidden;
+    }
+
+    /* Responsive Smart Grid Layouts based on active count */
+    #streams-grid[data-count="1"] {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+    }
+
+    #streams-grid[data-count="2"] {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr;
+    }
+
+    #streams-grid[data-count="3"] {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    #streams-grid[data-count="3"] .stream-card:nth-child(3) {
+      grid-column: 1 / -1;
+    }
+
+    #streams-grid[data-count="4"] {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    #streams-grid[data-count="5"],
+    #streams-grid[data-count="6"] {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    /* Stream Card */
+    .stream-card {
+      background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stream-card.dragging {
+      opacity: 0.4;
+      border: 2px dashed var(--accent-color);
+    }
+
+    .card-header {
+      height: 36px;
+      background: #1f1f23;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
+      padding: 0 0.5rem;
+      border-bottom: 1px solid var(--border-color);
       user-select: none;
     }
 
-    .header-clock .ampm { font-size: 13px; color: #a855f7; font-weight: 700; }
-
-    .btn-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 18px; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
-    .btn-icon:hover { background: var(--card-bg); }
-
-    .notif-wrapper { position: relative; }
-    .notif-badge {
-      position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff;
-      font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 10px; display: none;
+    .drag-handle {
+      cursor: grab;
+      padding: 0 0.3rem;
+      color: #adadb8;
     }
-    .notif-dropdown {
-      position: absolute; top: 44px; right: 0; width: 320px; max-height: 400px;
-      background: var(--header-bg); border: 1px solid var(--border-color); border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; flex-direction: column; z-index: 1000; overflow: hidden;
+
+    .channel-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex: 1;
+      margin-left: 0.5rem;
     }
-    .notif-dropdown.open { display: flex; }
-    .notif-header { padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); }
-    .notif-list { overflow-y: auto; max-height: 350px; }
-    .notif-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
-    .notif-item:hover { background: var(--card-bg); }
-    .notif-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
-    .notif-info { display: flex; flex-direction: column; overflow: hidden; }
-    .notif-name { font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .notif-game { font-size: 11px; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-    .layout-controls { display: flex; gap: 8px; align-items: center; }
-    
-    .btn-bandwidth { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 13px; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .btn-bandwidth.active { background: #9146ff; border-color: #9146ff; color: #fff; font-weight: bold; }
-    .btn-bandwidth:hover { background: var(--card-bg); }
-
-    .input-group { display: flex; gap: 8px; width: 340px; }
-    input { flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-color); outline: none; }
-    .btn-primary { padding: 8px 16px; background: #9146ff; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer; }
-    .btn-primary:hover { background: #772ce8; }
-    
-    .main-wrapper { flex: 1; display: flex; overflow: hidden; position: relative; }
-
-    .sidebar { width: var(--sidebar-width); background: var(--header-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.3s ease; z-index: 5; }
-    .sidebar.compact { --sidebar-width: 72px; }
-    .sidebar-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; align-items: center; white-space: nowrap; overflow: hidden; }
-    .sidebar.compact .sidebar-header { justify-content: center; padding: 12px 6px; }
-    .sidebar.compact .sidebar-header > *:not(.sidebar-actions) { display: none; }
-    .sidebar.compact .sidebar-actions { width: 100%; justify-content: center; }
-
-    .sidebar-actions { display: flex; gap: 6px; align-items: center; }
-    .sidebar-content { flex: 1; overflow-y: auto; padding: 8px; }
-    
-    .live-channel { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; overflow: hidden; position: relative; }
-    .live-channel:hover { background: var(--card-bg); border-color: var(--border-color); }
-    .channel-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
-    .channel-info { display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; }
-    .channel-name { font-weight: bold; font-size: 14px; text-overflow: ellipsis; overflow: hidden; }
-    .channel-meta { font-size: 12px; color: #a1a1aa; margin-top: 2px; text-overflow: ellipsis; overflow: hidden; }
-    .channel-title { font-size: 11px; color: #a1a1aa; text-overflow: ellipsis; overflow: hidden; margin-top: 4px; }
-    .live-dot { color: #ef4444; font-size: 10px; margin-right: 4px; }
-
-    .sidebar.compact .live-channel { justify-content: center; padding: 6px; }
-    .sidebar.compact .channel-info { display: none; }
-
-    .app-container { 
-      flex: 1; display: flex; overflow-y: auto; background-color: #0f0f13;
-      background-image: radial-gradient(circle at 50% 50%, rgba(145, 70, 255, 0.12) 0%, rgba(0, 0, 0, 0.75) 85%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
-      padding: 16px; align-items: center; justify-content: center; 
+    .card-actions {
+      display: flex;
+      gap: 0.3rem;
     }
-    
-    .streams-grid { display: grid; gap: 16px; width: 100%; height: 100%; max-width: 1700px; max-height: 950px; margin: auto; align-content: center; justify-content: center; }
 
-    .streams-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; max-width: 1200px; }
-    .streams-grid.count-2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: 1fr; }
-    .streams-grid.count-3 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
-    .streams-grid.count-3 .stream-card:nth-child(3) { grid-column: span 2; width: 60%; justify-self: center; }
-    .streams-grid.count-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
-    .streams-grid.count-5, .streams-grid.count-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+    .btn-icon {
+      background: transparent;
+      padding: 0.2rem 0.4rem;
+      font-size: 0.85rem;
+    }
 
-    .streams-grid.has-showstopper { grid-template-columns: 1fr 340px !important; grid-template-rows: 1fr !important; max-width: 100% !important; max-height: 100% !important; align-items: stretch; }
-    .streams-grid.has-showstopper .stream-card.showstopper { grid-column: 1 / 2 !important; grid-row: 1 / -1 !important; height: 100% !important; border: 2px solid #a855f7; box-shadow: 0 0 25px rgba(168, 85, 247, 0.35); }
-    .streams-grid.has-showstopper .side-streams-column { grid-column: 2 / 3 !important; grid-row: 1 / -1 !important; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; height: 100%; padding-right: 4px; }
-    .streams-grid.has-showstopper .side-streams-column .stream-card { height: 220px !important; min-height: 220px !important; flex-shrink: 0; }
-    
-    .stream-card { background: var(--header-bg); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: opacity 0.2s, border 0.2s, box-shadow 0.2s; border: 1px solid var(--border-color); width: 100%; height: 100%; max-height: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-    .stream-header { height: 32px; background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; cursor: grab; user-select: none; flex-shrink: 0; }
-    .stream-header:active { cursor: grabbing; }
-    .drag-handle { color: #a1a1aa; margin-right: 8px; cursor: inherit; }
-    .stream-card.dragging { opacity: 0.4; border: 2px dashed #00ffff; }
-    body.is-dragging iframe { pointer-events: none; }
-    
-    .stream-body { flex: 1; display: flex; position: relative; overflow: hidden; width: 100%; height: calc(100% - 32px); }
-    .video-container { flex: 1; position: relative; height: 100%; }
-    .video-frame { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
 
-    .chat-container { width: 280px; height: 100%; background: var(--header-bg); border-left: 1px solid var(--border-color); display: none; flex-shrink: 0; }
-    .stream-card.show-chat .chat-container { display: flex; }
-    .chat-frame { width: 100%; height: 100%; border: none; }
+    /* Main Container (Player + Chat) */
+    .card-body {
+      flex: 1;
+      display: flex;
+      position: relative;
+      background: #000;
+    }
 
-    .card-actions { display: flex; align-items: center; gap: 6px; }
-    .btn-card-action { background: transparent; color: #a1a1aa; border: none; font-size: 14px; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
-    .btn-card-action:hover { background: var(--header-bg); color: #fff; }
-    .btn-card-action.active { color: #a855f7; font-weight: bold; background: var(--border-color); }
-    .btn-showstopper.active { color: #f59e0b; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); }
-    .btn-remove:hover { color: #ef4444; }
+    .player-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Sliding Integrated Chat Panel */
+    .chat-panel {
+      width: 320px;
+      height: 100%;
+      background: #18181b;
+      border-left: 1px solid var(--border-color);
+      display: none;
+    }
+
+    .chat-panel.open {
+      display: block;
+    }
   </style>
-  <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 </head>
 <body>
 
   <header>
-    <div class="logo-container">
-      <button class="btn-icon" onclick="toggleSidebar()" title="Toggle Dashboard">☰</button>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 5px #00ffff);">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-        <path d="M2 12h20"></path>
-      </svg>
-      <div class="logo-text">OMNISTREAMER</div>
-    </div>
-    
-    <div class="header-clock" id="systemClock">
-      <span id="clockTime">00:00:00</span> <span class="ampm" id="clockAmPm">AM</span>
+    <div class="brand">
+      <span>OmniStreamer</span>
     </div>
 
-    <div style="display: flex; gap: 16px; align-items: center;">
-      <div class="layout-controls">
-        <button class="btn-bandwidth active" id="bandwidthBtn" onclick="toggleBandwidthSaver()" title="Cap all streams to 720p to save bandwidth">
-          ⚡ 720p Active
-        </button>
-        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
-        
-        <div class="notif-wrapper">
-          <button class="btn-icon" onclick="toggleNotificationDropdown()" title="Live Notifications">
-            🔔
-            <span class="notif-badge" id="notifBadge">0</span>
-          </button>
-          <div class="notif-dropdown" id="notifDropdown">
-            <div class="notif-header">
-              <span>Live Alerts</span>
-              <button class="btn-card-action" onclick="clearNotifications()" style="font-size: 11px;">Clear All</button>
-            </div>
-            <div class="notif-list" id="notifList">
-              <div style="padding: 16px; text-align: center; color: #a1a1aa; font-size: 12px;">No new live notifications</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="input-group">
-        <input type="text" id="streamUrl" placeholder="Paste Twitch channel URL or username..." onkeydown="if(event.key === 'Enter') addStream()">
-        <button class="btn-primary" onclick="addStream()">Add Stream</button>
-      </div>
+    <div class="controls">
+      <input type="text" id="channel-input" placeholder="Enter Twitch Channel..." />
+      <button id="add-btn">Add Stream</button>
+      <button id="bandwidth-btn" class="secondary">⚡ Bandwidth Saver (720p)</button>
+      <button id="login-btn" class="secondary">Login with Twitch</button>
     </div>
   </header>
 
-  <div class="main-wrapper" id="mainWrapper">
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header" id="sidebarHeader">
-        <span>Twitch Dashboard</span>
-      </div>
-      <div class="sidebar-content" id="sidebarContent">
-        <div style="text-align: center; padding: 20px 10px;">
-          <p style="font-size: 13px; color: #a1a1aa; margin-bottom: 12px;">Connect to Twitch to see who is live right now.</p>
-          <button class="btn-primary" style="width: 100%;" onclick="loginTwitch()">Login with Twitch</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="app-container" id="appContainer">
-      <div class="streams-grid count-0" id="streamsGrid"></div>
-    </div>
-  </div>
+  <main id="streams-grid" data-count="0"></main>
 
   <script>
-    const TWITCH_CLIENT_ID = 'hpipujxbz2nvmjjshhed7ewn2xvg13'; 
-    const DOMAIN = window.location.hostname || 'localhost'; 
-    const streamsGrid = document.getElementById('streamsGrid');
+    const grid = document.getElementById('streams-grid');
+    const input = document.getElementById('channel-input');
+    const addBtn = document.getElementById('add-btn');
+    const bandwidthBtn = document.getElementById('bandwidth-btn');
     
-    let draggedCard = null;
-    let twitchAccessToken = null;
-    let twitchUserId = null;
-    let previousLiveSet = new Set();
-    let isBandwidthSaverActive = true; 
-    let activePlayers = [];
-    let showstopperCardId = null;
-    let notificationsList = [];
+    let isBandwidthSaver = false;
+    let draggedItem = null;
 
-    function updateClock() {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      
-      hours = hours % 12;
-      hours = hours ? hours : 12;
-      const formattedHours = String(hours).padStart(2, '0');
+    // Helper: Update Grid Data Count Attribute
+    function updateGridCount() {
+      const count = grid.children.length;
+      grid.setAttribute('data-count', count);
+    }
+
+    // Add Stream Card
+    function addStream(channel) {
+      const cleanName = channel.trim().toLowerCase();
+      if (!cleanName || grid.children.length >= 6) return;
+
+      const card = document.createElement('div');
+      card.className = 'stream-card';
+      card.draggable = true;
+      card.dataset.channel = cleanName;
+
+      const parentDomain = window.location.hostname || 'localhost';
+
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="drag-handle">⠿</span>
+          <span class="channel-name">${cleanName}</span>
+          <div class="card-actions">
+            <button class="btn-icon chat-toggle" title="Toggle Chat">💬</button>
+            <button class="btn-icon remove-btn" title="Remove Stream">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="player-container">
+            <iframe
+              src="https://player.twitch.tv/?channel=${cleanName}&parent=${parentDomain}&autoplay=true"
+              allowfullscreen="true">
+            </iframe>
+          </div>
+          <div class="chat-panel">
+            <iframe
+              src="https://www.twitch.tv/embed/${cleanName}/chat?parent=${parentDomain}">
+            </iframe>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners for Card Features
+      const removeBtn = card.querySelector('.remove-btn');
+      removeBtn.addEventListener('click', () => {
+        card.remove();
+        updateGridCount();
+      });
+
+      const chatToggle = card.querySelector('.chat-toggle');
+      const chatPanel = card.querySelector('.chat-panel');
+      chatToggle.addEventListener('click', () => {
+        chatPanel.classList.toggle('open');
+      });
+
+      // Drag and Drop Event Handlers
+      card.addEventListener('dragstart', (e) => {
+        draggedItem = card;
+        card.classList.add('dragging');
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        draggedItem = null;
+      });
+
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedItem && draggedItem !== card) {
+          const children = Array.from(grid.children);
+          const dragged
