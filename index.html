@@ -24,6 +24,30 @@
       --input-bg: #ffffff;
     }
 
+    /* Seasonal Dynamic Overlays */
+    body.theme-halloween {
+      --bg-color: #120d1a;
+      --header-bg: #1c1428;
+      --border-color: #4a286b;
+      accent-color: #ff7518;
+    }
+    body.theme-halloween .logo-text {
+      background: linear-gradient(135deg, #ff7518 0%, #9146ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    body.theme-winter {
+      --bg-color: #0a1118;
+      --header-bg: #101c26;
+      --border-color: #1e3a5f;
+    }
+    body.theme-winter .logo-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
     
@@ -39,27 +63,9 @@
       text-transform: uppercase; 
       letter-spacing: 0.5px; 
       padding-right: 8px;
-      
-      background: linear-gradient(
-        135deg,
-        rgba(168, 85, 247, 0.75) 0%,
-        rgba(6, 182, 212, 0.65) 50%,
-        rgba(255, 255, 255, 0.95) 100%
-      ), linear-gradient(
-        to bottom,
-        #ffffff 0%,
-        #ffffff 35%,
-        #d1d5db 45%,
-        #64748b 48%,
-        #f8fafc 50%,
-        #1e293b 53%,
-        #475569 68%,
-        #e2e8f0 85%,
-        #ffffff 100%
-      );
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.75) 0%, rgba(6, 182, 212, 0.65) 50%, rgba(255, 255, 255, 0.95) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      
       filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.9));
     }
 
@@ -67,8 +73,6 @@
       font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
       font-size: 18px;
       font-weight: 600;
-      font-style: normal;
-      letter-spacing: 1px;
       color: #ffffff;
       padding: 4px 14px;
       background: rgba(255, 255, 255, 0.03);
@@ -80,65 +84,25 @@
       user-select: none;
     }
 
-    .header-clock .ampm {
-      font-size: 13px;
-      color: #a855f7;
-      font-weight: 700;
-    }
+    .header-clock .ampm { font-size: 13px; color: #a855f7; font-weight: 700; }
 
     .btn-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 18px; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
     .btn-icon:hover { background: var(--card-bg); }
 
-    /* Notification Center in Header */
     .notif-wrapper { position: relative; }
     .notif-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ef4444;
-      color: #fff;
-      font-size: 10px;
-      font-weight: bold;
-      padding: 1px 5px;
-      border-radius: 10px;
-      display: none;
+      position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff;
+      font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 10px; display: none;
     }
     .notif-dropdown {
-      position: absolute;
-      top: 44px;
-      right: 0;
-      width: 320px;
-      max-height: 400px;
-      background: var(--header-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-      overflow: hidden;
+      position: absolute; top: 44px; right: 0; width: 320px; max-height: 400px;
+      background: var(--header-bg); border: 1px solid var(--border-color); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6); display: none; flex-direction: column; z-index: 1000; overflow: hidden;
     }
     .notif-dropdown.open { display: flex; }
-    .notif-header {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-color);
-      font-weight: bold;
-      font-size: 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-    }
+    .notif-header { padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); }
     .notif-list { overflow-y: auto; max-height: 350px; }
-    .notif-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+    .notif-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
     .notif-item:hover { background: var(--card-bg); }
     .notif-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
     .notif-info { display: flex; flex-direction: column; overflow: hidden; }
@@ -150,7 +114,6 @@
     .btn-bandwidth { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-size: 13px; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
     .btn-bandwidth.active { background: #9146ff; border-color: #9146ff; color: #fff; font-weight: bold; }
     .btn-bandwidth:hover { background: var(--card-bg); }
-    .btn-bandwidth.active:hover { background: #772ce8; }
 
     .input-group { display: flex; gap: 8px; width: 340px; }
     input { flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-color); outline: none; }
@@ -159,18 +122,8 @@
     
     .main-wrapper { flex: 1; display: flex; overflow: hidden; position: relative; }
 
-    .sidebar { 
-      width: var(--sidebar-width); 
-      background: var(--header-bg); 
-      border-right: 1px solid var(--border-color); 
-      display: flex; 
-      flex-direction: column; 
-      transition: width 0.3s ease; 
-      z-index: 5;
-    }
-    
+    .sidebar { width: var(--sidebar-width); background: var(--header-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.3s ease; z-index: 5; }
     .sidebar.compact { --sidebar-width: 72px; }
-    
     .sidebar-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; align-items: center; white-space: nowrap; overflow: hidden; }
     .sidebar.compact .sidebar-header { justify-content: center; padding: 12px 6px; }
     .sidebar.compact .sidebar-header > *:not(.sidebar-actions) { display: none; }
@@ -181,10 +134,8 @@
     
     .live-channel { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; overflow: hidden; position: relative; }
     .live-channel:hover { background: var(--card-bg); border-color: var(--border-color); }
-    
     .channel-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
     .channel-info { display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; }
-    
     .channel-name { font-weight: bold; font-size: 14px; text-overflow: ellipsis; overflow: hidden; }
     .channel-meta { font-size: 12px; color: #a1a1aa; margin-top: 2px; text-overflow: ellipsis; overflow: hidden; }
     .channel-title { font-size: 11px; color: #a1a1aa; text-overflow: ellipsis; overflow: hidden; margin-top: 4px; }
@@ -194,29 +145,12 @@
     .sidebar.compact .channel-info { display: none; }
 
     .app-container { 
-      flex: 1; 
-      display: flex; 
-      overflow-y: auto; 
-      background-color: #0f0f13;
-      background-image: 
-        radial-gradient(circle at 50% 50%, rgba(145, 70, 255, 0.12) 0%, rgba(0, 0, 0, 0.75) 85%),
-        linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
-      padding: 16px; 
-      align-items: center; 
-      justify-content: center; 
+      flex: 1; display: flex; overflow-y: auto; background-color: #0f0f13;
+      background-image: radial-gradient(circle at 50% 50%, rgba(145, 70, 255, 0.12) 0%, rgba(0, 0, 0, 0.75) 85%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
+      padding: 16px; align-items: center; justify-content: center; 
     }
     
-    .streams-grid { 
-      display: grid; 
-      gap: 16px; 
-      width: 100%; 
-      height: 100%; 
-      max-width: 1700px;
-      max-height: 950px;
-      margin: auto;
-      align-content: center;
-      justify-content: center;
-    }
+    .streams-grid { display: grid; gap: 16px; width: 100%; height: 100%; max-width: 1700px; max-height: 950px; margin: auto; align-content: center; justify-content: center; }
 
     .streams-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; max-width: 1200px; }
     .streams-grid.count-2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: 1fr; }
@@ -225,84 +159,31 @@
     .streams-grid.count-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
     .streams-grid.count-5, .streams-grid.count-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
 
-    .streams-grid.has-showstopper {
-      grid-template-columns: 1fr 340px !important;
-      grid-template-rows: 1fr !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
-      align-items: stretch;
-    }
+    .streams-grid.has-showstopper { grid-template-columns: 1fr 340px !important; grid-template-rows: 1fr !important; max-width: 100% !important; max-height: 100% !important; align-items: stretch; }
+    .streams-grid.has-showstopper .stream-card.showstopper { grid-column: 1 / 2 !important; grid-row: 1 / -1 !important; height: 100% !important; border: 2px solid #a855f7; box-shadow: 0 0 25px rgba(168, 85, 247, 0.35); }
+    .streams-grid.has-showstopper .side-streams-column { grid-column: 2 / 3 !important; grid-row: 1 / -1 !important; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; height: 100%; padding-right: 4px; }
+    .streams-grid.has-showstopper .side-streams-column .stream-card { height: 220px !important; min-height: 220px !important; flex-shrink: 0; }
     
-    .streams-grid.has-showstopper .stream-card.showstopper {
-      grid-column: 1 / 2 !important;
-      grid-row: 1 / -1 !important;
-      height: 100% !important;
-      border: 2px solid #a855f7;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
-    }
-
-    .streams-grid.has-showstopper .side-streams-column {
-      grid-column: 2 / 3 !important;
-      grid-row: 1 / -1 !important;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      height: 100%;
-      padding-right: 4px;
-    }
-
-    .streams-grid.has-showstopper .side-streams-column .stream-card {
-      height: 220px !important;
-      min-height: 220px !important;
-      flex-shrink: 0;
-    }
-    
-    .stream-card { 
-      background: var(--header-bg); 
-      border-radius: 6px; 
-      overflow: hidden; 
-      display: flex; 
-      flex-direction: column; 
-      position: relative; 
-      transition: opacity 0.2s, border 0.2s, box-shadow 0.2s; 
-      border: 1px solid var(--border-color); 
-      width: 100%;
-      height: 100%;
-      max-height: 100%;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    
+    .stream-card { background: var(--header-bg); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: opacity 0.2s, border 0.2s, box-shadow 0.2s; border: 1px solid var(--border-color); width: 100%; height: 100%; max-height: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
     .stream-header { height: 32px; background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; cursor: grab; user-select: none; flex-shrink: 0; }
     .stream-header:active { cursor: grabbing; }
     .drag-handle { color: #a1a1aa; margin-right: 8px; cursor: inherit; }
     .stream-card.dragging { opacity: 0.4; border: 2px dashed #00ffff; }
     body.is-dragging iframe { pointer-events: none; }
     
-    .stream-body { 
-      flex: 1; 
-      display: flex; 
-      position: relative; 
-      overflow: hidden; 
-      width: 100%; 
-      height: calc(100% - 32px); 
-    }
-
-    .video-container { 
-      flex: 1; 
-      position: relative; 
-      height: 100%; 
-    }
+    .stream-body { flex: 1; display: flex; position: relative; overflow: hidden; width: 100%; height: calc(100% - 32px); }
+    .video-container { flex: 1; position: relative; height: 100%; }
     .video-frame { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-    .chat-container { 
-      width: 280px; 
-      height: 100%; 
-      background: var(--header-bg); 
-      border-left: 1px solid var(--border-color); 
-      display: none; 
-      flex-shrink: 0; 
+    /* Offline Failover overlay notice */
+    .offline-overlay {
+      position: absolute; inset: 0; background: rgba(14, 14, 16, 0.85);
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 10; text-align: center; padding: 16px; color: #fff;
     }
+    .stream-card.is-offline .offline-overlay { display: flex; }
+
+    .chat-container { width: 280px; height: 100%; background: var(--header-bg); border-left: 1px solid var(--border-color); display: none; flex-shrink: 0; }
     .stream-card.show-chat .chat-container { display: flex; }
     .chat-frame { width: 100%; height: 100%; border: none; }
 
@@ -315,7 +196,7 @@
   </style>
   <script src="https://player.twitch.tv/js/embed/v1.js"></script>
 </head>
-<body>
+<body id="appBody">
 
   <header>
     <div class="logo-container">
@@ -339,7 +220,6 @@
         </button>
         <button class="btn-icon" onclick="toggleTheme()" title="Toggle Dark/Light Mode" id="themeIcon">🌓</button>
         
-        <!-- Header Notification Center Block -->
         <div class="notif-wrapper">
           <button class="btn-icon" onclick="toggleNotificationDropdown()" title="Live Notifications">
             🔔
@@ -358,475 +238,4 @@
       </div>
 
       <div class="input-group">
-        <input type="text" id="streamUrl" placeholder="Paste Twitch channel URL or username..." onkeydown="if(event.key === 'Enter') addStream()">
-        <button class="btn-primary" onclick="addStream()">Add Stream</button>
-      </div>
-    </div>
-  </header>
-
-  <div class="main-wrapper" id="mainWrapper">
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header" id="sidebarHeader">
-        <span>Twitch Dashboard</span>
-      </div>
-      <div class="sidebar-content" id="sidebarContent">
-        <div style="text-align: center; padding: 20px 10px;">
-          <p style="font-size: 13px; color: #a1a1aa; margin-bottom: 12px;">Connect to Twitch to see who is live right now.</p>
-          <button class="btn-primary" style="width: 100%;" onclick="loginTwitch()">Login with Twitch</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="app-container" id="appContainer">
-      <div class="streams-grid count-0" id="streamsGrid"></div>
-    </div>
-  </div>
-
-  <script>
-    const TWITCH_CLIENT_ID = 'hpipujxbz2nvmjjshhed7ewn2xvg13'; 
-    const DOMAIN = window.location.hostname || 'localhost'; 
-    const streamsGrid = document.getElementById('streamsGrid');
-    
-    let draggedCard = null;
-    let twitchAccessToken = null;
-    let twitchUserId = null;
-    let previousLiveSet = new Set();
-    let isBandwidthSaverActive = true; // Enabled by default
-    let activePlayers = [];
-    let showstopperCardId = null;
-    let notificationsList = [];
-
-    function updateClock() {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      
-      hours = hours % 12;
-      hours = hours ? hours : 12;
-      const formattedHours = String(hours).padStart(2, '0');
-
-      document.getElementById('clockTime').textContent = `${formattedHours}:${minutes}:${seconds}`;
-      document.getElementById('clockAmPm').textContent = ampm;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    function updateGridClass() {
-      const sideCol = streamsGrid.querySelector('.side-streams-column');
-      if (sideCol) {
-        while (sideCol.firstChild) {
-          streamsGrid.appendChild(sideCol.firstChild);
-        }
-        sideCol.remove();
-      }
-
-      document.querySelectorAll('.stream-card').forEach(c => c.classList.remove('showstopper'));
-
-      const allCards = Array.from(streamsGrid.querySelectorAll('.stream-card'));
-      const count = allCards.length;
-
-      if (showstopperCardId && count > 1) {
-        const showCard = allCards.find(c => c.dataset.cardId === showstopperCardId);
-        if (showCard) {
-          streamsGrid.className = 'streams-grid has-showstopper';
-          showCard.classList.add('showstopper');
-          
-          const sideColumn = document.createElement('div');
-          sideColumn.className = 'side-streams-column';
-          
-          allCards.forEach(c => {
-            if (c.dataset.cardId !== showstopperCardId) {
-              sideColumn.appendChild(c);
-            }
-          });
-          streamsGrid.appendChild(sideColumn);
-          return;
-        } else {
-          showstopperCardId = null;
-        }
-      }
-
-      streamsGrid.className = `streams-grid count-${Math.min(count, 6)}`;
-    }
-
-    function toggleShowstopper(cardId) {
-      if (showstopperCardId === cardId) {
-        showstopperCardId = null;
-      } else {
-        showstopperCardId = cardId;
-      }
-
-      document.querySelectorAll('.stream-card').forEach(c => {
-        const btn = c.querySelector('.btn-showstopper');
-        if (c.dataset.cardId === showstopperCardId) {
-          btn.classList.add('active');
-          btn.title = 'Exit Showstopper Mode';
-        } else {
-          btn.classList.remove('active');
-          btn.title = 'Make Showstopper Stream';
-        }
-      });
-
-      updateGridClass();
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('compact');
-    }
-
-    function toggleNotificationDropdown() {
-      const dropdown = document.getElementById('notifDropdown');
-      dropdown.classList.toggle('open');
-    }
-
-    // Close notification dropdown when clicking outside
-    window.addEventListener('click', (e) => {
-      if (!e.target.closest('.notif-wrapper')) {
-        document.getElementById('notifDropdown').classList.remove('open');
-      }
-    });
-
-    function loginTwitch() {
-      const redirectUri = window.location.href.split('#')[0];
-      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=user:read:follows`;
-      window.location.href = authUrl;
-    }
-
-    function checkTwitchAuth() {
-      const hash = window.location.hash;
-      if (hash.includes('access_token=')) {
-        const params = new URLSearchParams(hash.substring(1));
-        twitchAccessToken = params.get('access_token');
-        localStorage.setItem('twitch_access_token', twitchAccessToken);
-        window.history.replaceState(null, null, window.location.pathname);
-      } else {
-        twitchAccessToken = localStorage.getItem('twitch_access_token');
-      }
-
-      if (twitchAccessToken) {
-        fetchTwitchUser();
-      }
-    }
-
-    async function fetchTwitchUser() {
-      document.getElementById('sidebarContent').innerHTML = '<div style="padding: 12px; text-align: center;">Loading...</div>';
-      try {
-        const res = await fetch('https://api.twitch.tv/helix/users', {
-          headers: { 'Authorization': `Bearer ${twitchAccessToken}`, 'Client-Id': TWITCH_CLIENT_ID }
-        });
-        
-        if (res.status === 401) {
-          localStorage.removeItem('twitch_access_token');
-          location.reload();
-          return;
-        }
-
-        const data = await res.json();
-        if (data.data && data.data.length > 0) {
-          twitchUserId = data.data[0].id;
-          
-          document.getElementById('sidebarHeader').innerHTML = `
-            <span style="overflow: hidden; text-overflow: ellipsis;">${data.data[0].display_name}</span>
-            <div class="sidebar-actions"></div>
-          `;
-          
-          fetchLiveFollows();
-          setInterval(fetchLiveFollows, 120000);
-        }
-      } catch (err) {
-        console.error("Twitch API Error", err);
-      }
-    }
-
-    async function fetchLiveFollows() {
-      try {
-        const res = await fetch(`https://api.twitch.tv/helix/streams/followed?user_id=${twitchUserId}`, {
-          headers: { 'Authorization': `Bearer ${twitchAccessToken}`, 'Client-Id': TWITCH_CLIENT_ID }
-        });
-        const streamsData = await res.json();
-        const streams = streamsData.data;
-
-        if (!streams || streams.length === 0) {
-          renderLiveChannels([]);
-          previousLiveSet.clear();
-          return;
-        }
-
-        const currentLiveSet = new Set(streams.map(s => s.user_id));
-        
-        const userIds = streams.slice(0, 100).map(s => s.user_id);
-        const queryParams = userIds.map(id => `id=${id}`).join('&');
-        
-        const usersRes = await fetch(`https://api.twitch.tv/helix/users?${queryParams}`, {
-          headers: { 'Authorization': `Bearer ${twitchAccessToken}`, 'Client-Id': TWITCH_CLIENT_ID }
-        });
-        const usersData = await usersRes.json();
-        
-        const avatarMap = {};
-        usersData.data.forEach(u => {
-          avatarMap[u.id] = u.profile_image_url;
-        });
-
-        const enrichedStreams = streams.map(s => ({
-          ...s,
-          avatar: avatarMap[s.user_id] || ''
-        }));
-
-        if (previousLiveSet.size > 0) {
-          enrichedStreams.forEach(s => {
-            if (!previousLiveSet.has(s.user_id)) {
-              addHeaderNotification(s);
-            }
-          });
-        }
-        previousLiveSet = currentLiveSet;
-
-        renderLiveChannels(enrichedStreams);
-      } catch (err) {
-        console.error("Twitch API Error", err);
-      }
-    }
-
-    function addHeaderNotification(stream) {
-      notificationsList.unshift(stream);
-      updateNotificationUI();
-    }
-
-    function updateNotificationUI() {
-      const badge = document.getElementById('notifBadge');
-      const list = document.getElementById('notifList');
-      
-      if (notificationsList.length > 0) {
-        badge.textContent = notificationsList.length;
-        badge.style.display = 'block';
-        
-        list.innerHTML = notificationsList.map((n, idx) => `
-          <div class="notif-item" onclick="openNotificationStream('${n.user_name}', ${idx})">
-            <img src="${n.avatar || 'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142694348.png'}" class="notif-avatar" alt="${n.user_name}">
-            <div class="notif-info">
-              <div class="notif-name">${n.user_name} is now live!</div>
-              <div class="notif-game">${n.game_name || 'Streaming'}</div>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        badge.style.display = 'none';
-        list.innerHTML = '<div style="padding: 16px; text-align: center; color: #a1a1aa; font-size: 12px;">No new live notifications</div>';
-      }
-    }
-
-    function openNotificationStream(username, index) {
-      addStreamFromSidebar(username);
-      notificationsList.splice(index, 1);
-      updateNotificationUI();
-      document.getElementById('notifDropdown').classList.remove('open');
-    }
-
-    function clearNotifications() {
-      notificationsList = [];
-      updateNotificationUI();
-    }
-
-    function renderLiveChannels(channels) {
-      const content = document.getElementById('sidebarContent');
-      if (!channels || channels.length === 0) {
-        content.innerHTML = '<div style="padding: 12px; font-size: 13px; color: #a1a1aa; text-align: center;">No followed channels are live.</div>';
-        return;
-      }
-      
-      content.innerHTML = channels.map(c => {
-        return `
-          <div class="live-channel" onclick="addStreamFromSidebar('${c.user_name}')">
-            <img src="${c.avatar}" class="channel-avatar" alt="${c.user_name}">
-            <div class="channel-info">
-              <div class="channel-name">${c.user_name}</div>
-              <div class="channel-meta"><span class="live-dot">●</span> ${c.viewer_count.toLocaleString()} • ${c.game_name}</div>
-              <div class="channel-title">${c.title}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function addStreamFromSidebar(username) {
-      document.getElementById('streamUrl').value = `https://twitch.tv/${username}`;
-      addStream();
-    }
-
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('light-mode');
-      document.getElementById('themeIcon').textContent = body.classList.contains('light-mode') ? '☀️️' : '🌓';
-    }
-
-    function toggleBandwidthSaver() {
-      isBandwidthSaverActive = !isBandwidthSaverActive;
-      const btn = document.getElementById('bandwidthBtn');
-      
-      if (isBandwidthSaverActive) {
-        btn.classList.add('active');
-        btn.innerHTML = '⚡ 720p Active';
-      } else {
-        btn.classList.remove('active');
-        btn.innerHTML = '⚡ 720p Cap';
-      }
-
-      activePlayers.forEach(item => {
-        try {
-          if (isBandwidthSaverActive) {
-            const qualities = item.player.getQualities();
-            const targetQual = qualities.find(q => q.name.includes('720') || q.group === '720p') || qualities[qualities.length - 2];
-            if (targetQual) {
-              item.player.setQuality(targetQual.group || targetQual.name);
-            }
-          } else {
-            const qualities = item.player.getQualities();
-            if (qualities && qualities.length > 0) {
-              item.player.setQuality(qualities[0].group || qualities[0].name);
-            }
-          }
-        } catch (e) {
-          console.error("Could not adjust stream quality:", e);
-        }
-      });
-    }
-
-    function parseStreamUrl(inputVal) {
-      inputVal = inputVal.trim();
-      if (!inputVal) return null;
-
-      let channelName = '';
-      if (inputVal.includes('twitch.tv/')) {
-        channelName = inputVal.split('twitch.tv/')[1].split('/')[0].split('?')[0];
-      } else {
-        channelName = inputVal.replace(/[^a-zA-Z0-9_]/g, '');
-      }
-
-      return channelName ? { platform: 'twitch', id: channelName.toLowerCase() } : null;
-    }
-
-    function addStream() {
-      if (streamsGrid.children.length >= 6) { alert('Maximum of 6 streams allowed.'); return; }
-      const input = document.getElementById('streamUrl');
-      const parsed = parseStreamUrl(input.value);
-      if (!parsed) { alert('Please enter a valid Twitch URL or username.'); return; }
-
-      const cardId = 'twitch-embed-' + Math.random().toString(36).substring(2, 9);
-      const chatId = 'chat-iframe-' + cardId;
-
-      const card = document.createElement('div');
-      card.className = 'stream-card';
-      card.draggable = true;
-      card.dataset.cardId = cardId;
-      
-      card.innerHTML = `
-        <div class="stream-header">
-          <div style="display: flex; align-items: center;">
-            <span class="drag-handle">⠿</span>
-            <span><strong>${parsed.id}</strong></span>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card-action btn-showstopper" title="Make Showstopper Stream" onclick="toggleShowstopper('${cardId}')">⭐</button>
-            <button class="btn-card-action" id="btn-chat-${cardId}" title="Toggle Chat Panel" onclick="toggleIntegratedChat('${cardId}')">💬</button>
-            <button class="btn-card-action btn-remove" title="Remove stream" onclick="removeStreamCard('${cardId}')">✕</button>
-          </div>
-        </div>
-        <div class="stream-body">
-          <div class="video-container">
-            <div id="${cardId}" class="video-frame"></div>
-          </div>
-          <div class="chat-container">
-            <iframe id="${chatId}" class="chat-frame" src=""></iframe>
-          </div>
-        </div>
-      `;
-
-      card.addEventListener('dragstart', function(e) { draggedCard = this; setTimeout(() => this.classList.add('dragging'), 0); document.body.classList.add('is-dragging'); });
-      card.addEventListener('dragend', function() { draggedCard = null; this.classList.remove('dragging'); document.body.classList.remove('is-dragging'); updateGridClass(); });
-      card.addEventListener('dragover', function(e) {
-        e.preventDefault(); 
-        if (this === draggedCard) return;
-        const rect = this.getBoundingClientRect();
-        streamsGrid.insertBefore(draggedCard, e.clientX < (rect.x + rect.width / 2) ? this : this.nextSibling);
-      });
-
-      if (showstopperCardId && streamsGrid.querySelector('.side-streams-column')) {
-        streamsGrid.querySelector('.side-streams-column').appendChild(card);
-      } else {
-        streamsGrid.appendChild(card);
-      }
-      
-      input.value = '';
-      updateGridClass();
-
-      const options = {
-        width: '100%',
-        height: '100%',
-        channel: parsed.id,
-        parent: [DOMAIN],
-        autoplay: true,
-        muted: true
-      };
-      
-      const player = new Twitch.Player(cardId, options);
-      
-      player.addEventListener(Twitch.Player.READY, () => {
-        activePlayers.push({ id: cardId, player: player });
-        player.play();
-        
-        setTimeout(() => {
-          try {
-            player.setMuted(false);
-          } catch (e) {}
-        }, 500);
-        
-        if (isBandwidthSaverActive) {
-          try {
-            const qualities = player.getQualities();
-            const targetQual = qualities.find(q => q.name.includes('720') || q.group === '720p') || qualities[qualities.length - 2];
-            if (targetQual) {
-              player.setQuality(targetQual.group || targetQual.name);
-            }
-          } catch (e) {
-            console.error("Initial quality cap failed:", e);
-          }
-        }
-      });
-    }
-
-    function toggleIntegratedChat(cardId) {
-      const card = document.querySelector(`[data-card-id="${cardId}"]`);
-      const btn = document.getElementById('btn-chat-' + cardId);
-      const iframe = document.getElementById('chat-iframe-' + cardId);
-      const channelName = card.querySelector('.stream-header strong').textContent;
-
-      card.classList.toggle('show-chat');
-      
-      if (card.classList.contains('show-chat')) {
-        btn.classList.add('active');
-        if (!iframe.src || iframe.src === window.location.href || iframe.src === '') {
-          iframe.src = `https://www.twitch.tv/embed/${channelName}/chat?parent=${DOMAIN}`;
-        }
-      } else {
-        btn.classList.remove('active');
-      }
-    }
-
-    function removeStreamCard(cardId) {
-      if (showstopperCardId === cardId) {
-        showstopperCardId = null;
-      }
-      activePlayers = activePlayers.filter(item => item.id !== cardId);
-      const card = document.querySelector(`[data-card-id="${cardId}"]`);
-      if (card) {
-        card.remove();
-        updateGridClass();
-      }
-    }
-
-    checkTwitchAuth();
-  </script>
-</body>
-</html>
+        <input type="text" id="streamUrl" placeholder="Paste Twitch channel URL or
