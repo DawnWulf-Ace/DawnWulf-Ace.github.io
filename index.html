@@ -93,6 +93,22 @@
       border-color: var(--accent-secondary);
     }
 
+    .auth-btn {
+      background: var(--accent-secondary);
+      color: #0c0c14;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Courier New', Courier, monospace;
+      transition: opacity 0.2s;
+    }
+
+    .auth-btn:hover {
+      opacity: 0.85;
+    }
+
     /* --- Main Layout --- */
     .main-container {
       display: flex;
@@ -141,7 +157,7 @@
       border-color: var(--accent-secondary);
     }
 
-    /* --- Dynamic Workspace (Standard Grid vs Showstopper Stack) --- */
+    /* --- Dynamic Workspace --- */
     .workspace {
       flex: 1;
       padding: 15px;
@@ -158,14 +174,14 @@
       overflow-y: auto;
     }
 
-    /* Showstopper Layout: Spotlight Left, Scroll-Free Stack Right */
+    /* Showstopper Layout: Spotlight 50% (flex: 2), Stacked Pane 25% (flex: 1) */
     .workspace.showstopper-mode {
       display: flex;
       flex-direction: row;
     }
 
     .workspace.showstopper-mode .spotlight-pane {
-      flex: 3;
+      flex: 2;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -177,13 +193,12 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      min-width: 300px;
+      min-width: 250px;
     }
 
-    /* In Showstopper Stack, cards dynamically resize to fit remaining height perfectly */
     .workspace.showstopper-mode .stack-pane .stream-card {
       flex: 1;
-      min-height: 0; /* Prevents flex overflow */
+      min-height: 0;
     }
 
     .stream-card {
@@ -328,7 +343,7 @@
     <div class="header-controls">
       <div id="liveClock" class="live-clock">00:00:00</div>
       <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌙</button>
-      <button id="authBtn" style="background:var(--accent-secondary); border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">TWITCH LOGIN</button>
+      <button id="authBtn" class="auth-btn" onclick="handleTwitchLogin()">TWITCH LOGIN</button>
     </div>
   </header>
 
@@ -337,7 +352,6 @@
     <sidebar>
       <div class="sidebar-title">Live Follows</div>
       <div class="followed-list" id="followedList">
-        <!-- Quick sample buttons to test layouting with multiple streams -->
         <div class="streamer-item" onclick="addStream('ninja')"><span>🔴 ninja</span></div>
         <div class="streamer-item" onclick="addStream('shroud')"><span>🔴 shroud</span></div>
         <div class="streamer-item" onclick="addStream('tarik')"><span>🔴 tarik</span></div>
@@ -345,7 +359,7 @@
       </div>
     </sidebar>
 
-    <!-- Workspace Container (Switches dynamically between Grid and Showstopper Stack) -->
+    <!-- Workspace Container -->
     <div id="workspace" class="workspace">
       <div id="streamsContainer" class="streams-grid"></div>
     </div>
@@ -371,7 +385,7 @@
     // --- State Management ---
     let activeStreams = [];
     let twitchPlayers = {};
-    let showstopperChannel = null; // Channel currently spotlighted
+    let showstopperChannel = null;
     const workspace = document.getElementById('workspace');
     const streamsContainer = document.getElementById('streamsContainer');
 
@@ -392,7 +406,24 @@
       btn.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
     }
 
-    // --- Intelligent Workspace Rendering (Grid vs Scroll-Free Showstopper) ---
+    // --- Twitch Login Handler ---
+    function handleTwitchLogin() {
+      // Check if running on file:// protocol
+      if (window.location.protocol === 'file:') {
+        alert("⚠ ERROR: Twitch authentication requires running on a local server (like localhost) instead of opening files directly via file://. Please use a local server tool (e.g., VS Code Live Server).");
+        return;
+      }
+      
+      // Placeholder for Twitch OAuth Redirect Flow
+      // Replace YOUR_CLIENT_ID with a registered Twitch Developer Client ID if connecting a custom app backend
+      const clientId = 'placeholder_client_id'; 
+      const redirectUri = window.location.origin + window.location.pathname;
+      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows`;
+      
+      window.location.href = authUrl;
+    }
+
+    // --- Workspace Rendering ---
     function renderWorkspace() {
       streamsContainer.innerHTML = '';
       twitchPlayers = {};
@@ -404,21 +435,17 @@
         return;
       }
 
-      // Check if Showstopper Mode is active and valid
       const isShowstopper = showstopperChannel && activeStreams.includes(showstopperChannel) && activeStreams.length > 1;
 
       if (isShowstopper) {
-        // --- SHOWSTOPPER SCROLL-FREE LAYOUT ---
         workspace.className = 'workspace showstopper-mode';
         
-        // 1. Spotlight Pane (Left)
         const spotlightPane = document.createElement('div');
         spotlightPane.className = 'spotlight-pane';
         spotlightPane.innerHTML = createCardHTML(showstopperChannel, true);
         streamsContainer.appendChild(spotlightPane);
         initTwitchPlayer(`twitch-embed-${showstopperChannel}`, showstopperChannel);
 
-        // 2. Stacked Pane (Right - vertically proportioned with zero scrolling)
         const stackPane = document.createElement('div');
         stackPane.className = 'stack-pane';
         
@@ -445,7 +472,6 @@
         streamsContainer.appendChild(stackPane);
 
       } else {
-        // --- STANDARD GRID LAYOUT ---
         workspace.className = 'workspace';
         streamsContainer.className = 'streams-grid';
         streamsContainer.style.display = 'grid';
@@ -476,7 +502,7 @@
       return `
         <div class="stream-card" style="height: 100%;">
           <div class="stream-header">
-            <span>🔴 ${channel} <span style="font-size:10px; color:var(--accent-secondary);">${isSpotlight ? '(SHOWSTOPPER SPOTLIGHT)' : '(720p Capped)'}</span></span>
+            <span>🔴 ${channel} <span style="font-size:10px; color:var(--accent-secondary);">${isSpotlight ? '(SHOWSTOPPER 50%)' : '(720p Capped)'}</span></span>
             <div class="stream-actions">
               ${isSpotlight ? `<button onclick="exitShowstopper()" title="Exit Spotlight">🔲</button>` : `<button onclick="toggleShowstopper('${channel}')" title="Spotlight">⭐</button>`}
               <button onclick="removeStream('${channel}')" title="Close">✕</button>
@@ -580,7 +606,7 @@
     function executeBandwidthThrottle() {
       document.getElementById('inactivityModal').style.display = 'none';
       if (activeStreams.length <= 1) return;
-      activeStreams = [showstopperChannel || activeStreams[0]]; // Solo mode
+      activeStreams = [showstopperChannel || activeStreams[0]];
       showstopperChannel = null;
       renderWorkspace();
     }
