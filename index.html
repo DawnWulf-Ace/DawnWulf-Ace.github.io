@@ -141,7 +141,7 @@
       border-color: var(--accent-secondary);
     }
 
-    /* --- Dynamic Workspace --- */
+    /* --- Dynamic Workspace (Standard Grid vs Showstopper Stack) --- */
     .workspace {
       flex: 1;
       padding: 15px;
@@ -158,32 +158,32 @@
       overflow-y: auto;
     }
 
-    /* Showstopper Layout: Spotlight 50% (flex: 2), Stacked Pane 25% (flex: 1) */
+    /* Showstopper Layout: Spotlight Left, Scroll-Free Stack Right */
     .workspace.showstopper-mode {
       display: flex;
       flex-direction: row;
     }
 
     .workspace.showstopper-mode .spotlight-pane {
-      flex: 2; /* 50% Width Spotlight */
+      flex: 3;
       height: 100%;
       display: flex;
       flex-direction: column;
     }
 
     .workspace.showstopper-mode .stack-pane {
-      flex: 1; /* 25% Width Stacked Column */
+      flex: 1;
       height: 100%;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      min-width: 250px;
+      min-width: 300px;
     }
 
     /* In Showstopper Stack, cards dynamically resize to fit remaining height perfectly */
     .workspace.showstopper-mode .stack-pane .stream-card {
       flex: 1;
-      min-height: 0;
+      min-height: 0; /* Prevents flex overflow */
     }
 
     .stream-card {
@@ -337,6 +337,7 @@
     <sidebar>
       <div class="sidebar-title">Live Follows</div>
       <div class="followed-list" id="followedList">
+        <!-- Quick sample buttons to test layouting with multiple streams -->
         <div class="streamer-item" onclick="addStream('ninja')"><span>🔴 ninja</span></div>
         <div class="streamer-item" onclick="addStream('shroud')"><span>🔴 shroud</span></div>
         <div class="streamer-item" onclick="addStream('tarik')"><span>🔴 tarik</span></div>
@@ -344,7 +345,7 @@
       </div>
     </sidebar>
 
-    <!-- Workspace Container -->
+    <!-- Workspace Container (Switches dynamically between Grid and Showstopper Stack) -->
     <div id="workspace" class="workspace">
       <div id="streamsContainer" class="streams-grid"></div>
     </div>
@@ -370,7 +371,7 @@
     // --- State Management ---
     let activeStreams = [];
     let twitchPlayers = {};
-    let showstopperChannel = null;
+    let showstopperChannel = null; // Channel currently spotlighted
     const workspace = document.getElementById('workspace');
     const streamsContainer = document.getElementById('streamsContainer');
 
@@ -391,7 +392,7 @@
       btn.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
     }
 
-    // --- Workspace Rendering ---
+    // --- Intelligent Workspace Rendering (Grid vs Scroll-Free Showstopper) ---
     function renderWorkspace() {
       streamsContainer.innerHTML = '';
       twitchPlayers = {};
@@ -403,20 +404,21 @@
         return;
       }
 
+      // Check if Showstopper Mode is active and valid
       const isShowstopper = showstopperChannel && activeStreams.includes(showstopperChannel) && activeStreams.length > 1;
 
       if (isShowstopper) {
-        // --- SHOWSTOPPER 50% SPOTLIGHT & 25% STACKED LAYOUT ---
+        // --- SHOWSTOPPER SCROLL-FREE LAYOUT ---
         workspace.className = 'workspace showstopper-mode';
         
-        // 1. Spotlight Pane (Takes 50% width via flex: 2)
+        // 1. Spotlight Pane (Left)
         const spotlightPane = document.createElement('div');
         spotlightPane.className = 'spotlight-pane';
         spotlightPane.innerHTML = createCardHTML(showstopperChannel, true);
         streamsContainer.appendChild(spotlightPane);
         initTwitchPlayer(`twitch-embed-${showstopperChannel}`, showstopperChannel);
 
-        // 2. Stacked Pane (Takes 25% width via flex: 1, remaining space adjusts cleanly)
+        // 2. Stacked Pane (Right - vertically proportioned with zero scrolling)
         const stackPane = document.createElement('div');
         stackPane.className = 'stack-pane';
         
@@ -474,7 +476,7 @@
       return `
         <div class="stream-card" style="height: 100%;">
           <div class="stream-header">
-            <span>🔴 ${channel} <span style="font-size:10px; color:var(--accent-secondary);">${isSpotlight ? '(SHOWSTOPPER 50%)' : '(720p Capped)'}</span></span>
+            <span>🔴 ${channel} <span style="font-size:10px; color:var(--accent-secondary);">${isSpotlight ? '(SHOWSTOPPER SPOTLIGHT)' : '(720p Capped)'}</span></span>
             <div class="stream-actions">
               ${isSpotlight ? `<button onclick="exitShowstopper()" title="Exit Spotlight">🔲</button>` : `<button onclick="toggleShowstopper('${channel}')" title="Spotlight">⭐</button>`}
               <button onclick="removeStream('${channel}')" title="Close">✕</button>
@@ -578,7 +580,7 @@
     function executeBandwidthThrottle() {
       document.getElementById('inactivityModal').style.display = 'none';
       if (activeStreams.length <= 1) return;
-      activeStreams = [showstopperChannel || activeStreams[0]];
+      activeStreams = [showstopperChannel || activeStreams[0]]; // Solo mode
       showstopperChannel = null;
       renderWorkspace();
     }
